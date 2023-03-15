@@ -1,35 +1,38 @@
 const express = require("express");
-const fetch = require("node-fetch");
-// const fetch = require("node-fetch@2");
 const nodeCache = require("node-cache");
-
-const myCache = new nodeCache({ stdTTL: 10 });
+const cors = require("cors");
+const http = require('http');
+var bodyParser = require('body-parser');
 
 const app = express();
-const port = 3000;
+const port = 4200;
 
-const todoURL = 'https://jsonplaceholder.typicode.com/todos';
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-app.get('/todos', (req, res) => {
-    if (myCache.has("todos")) {
-        console.log("Getting it from cache");
-        return res.send(myCache.get("todos"))
+var corsOption = {
+    origin: '*',
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    exposedHeaders: [
+        "Authorization",
+        "Content-Type",
+        "x-auth-token",
+        "authorization",
+        "Access-Control-Allow-Headers"
+    ],
+    credentials: true,
+};
+app.use(cors(corsOption));
+app.use("*", cors(corsOption));
 
-    } else {
-        fetch(todoURL)
-            .then((response) => response.json())
-            .then((json) => {
-                myCache.set("todos", json);
-                console.log("Getting it from API")
-                res.send(json)
-            })
-    }
-})
+app.use(require("./routes/index.route.js"));
 
-app.get("/stats", (req, res) => {
-    return res.send(myCache.getStats())
-})
-
-app.listen(port, () => {
+app.set('port', port);
+const server = http.createServer(app);
+server.listen(port, () => {
     console.log("Server is running on port " + port)
 })
+server.timeout = 500000;
+console.log('Server running on localhost:' + port);
+
+module.exports = app;
