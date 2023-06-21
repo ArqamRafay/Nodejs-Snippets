@@ -4,7 +4,7 @@
   "description": "nodejs cache server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test/index.test.js",
     "start": "node index.js"
   },
   "keywords": [
@@ -22,5 +22,9 @@
     "logger": "^0.0.1",
     "node-cache": "^5.1.2",
     "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0"
   }
 }
